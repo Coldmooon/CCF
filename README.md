@@ -4,7 +4,7 @@ The codes are for the paper "Convolutional Channel Features For Pedestrian, Face
 
 Currently the codes include training and testing part for Caltech pedestrian detection. Models to produce curves in the paper are also provided.
 
-The codes are written in Matlab codes, dependent on Caffe toolkit and Piotr's Computer Vision Matlab Toolbox. Codes are tested on Linux 12.04.3 LTS with 128GB memory and a Titan Z GPU card.
+The codes are written in Matlab codes, dependent on Caffe toolkit and Piotr's Computer Vision Matlab Toolbox. Codes are tested on Linux 12.04.3 LTS with 128GB memory.
 
 ### Preparation ###
 
@@ -15,6 +15,7 @@ The codes are written in Matlab codes, dependent on Caffe toolkit and Piotr's Co
 ### Use trained CCF model for pedestrian detection ###
 
 * simply run './runDetect.m' and follow instructions in the codes, detection results will be save as 'allBBs.mat'
+* If you want to run on multiple threads, use 'CUDA_VISIBLE_DEVCIES' environment variable to get matCaffe run on multiple GPU devices (which is a simple patch for an existing Caffe bug)
 
 ### Train a CCF pedestrian detector ###
 
