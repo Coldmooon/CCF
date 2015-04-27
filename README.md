@@ -26,7 +26,7 @@ The codes are written in Matlab codes, dependent on Caffe toolkit and Piotr's Co
 
 ### Power law ###
 
-* Power law can accelerates the detection time by a large margin with unnoticeable performance decrease. However, it doesn't hold for CCF on Caltech Pedestrian Dataset.
+* Power law can accelerate the detection time by a large margin with unnoticeable performance decrease (see paper for more details). Unfortunately, it doesn't hold for CCF on Caltech Pedestrian Dataset.
 * You can check whether the power law holds for specific feature types on specific datasets using codes in './power_law'. Simply run 'getMean.m' and 'getLambda.m' in turn.
 
 ### Bug report ###
