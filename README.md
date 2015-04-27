@@ -23,7 +23,7 @@ The codes are written in Matlab codes, dependent on Caffe toolkit and Piotr's Co
 * Run './getFeat_train.m' to extract features of training data
 * Run './trainModel.m' to train the boosting decision tree model
 * Run './runDetect.m' using your model
-* (Evaluation) With detection results available, modify './toolbox-master/detector/acfTest.m' yourself a little to evaluate the results, and './data/code3.2.1/dbEval.m' to plot curves in comparison state-of-the-arts
+* (Evaluation) With detection results available, modify './toolbox-master/detector/acfTest.m' yourself a little to evaluate the results, and './data/code3.2.1/dbEval.m' to plot curves in comparison with state-of-the-arts
 
 ### Power law ###
 
