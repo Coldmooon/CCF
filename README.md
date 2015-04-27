@@ -18,7 +18,7 @@ The codes are written in Matlab codes, dependent on Caffe toolkit and Piotr's Co
 
 ### Train a CCF pedestrian detector ###
 
-* Run modified './toolbox-master/detector/acfDemoCal.m' to train a Acf detector and save the collected bbs for training
+* Run modified './toolbox-master/detector/acfDemoCal.m' to train an ACF detector and save the collected bbs for training
 * Run './getFeat_train.m' to extract features of training data
 * Run './trainModel.m' to train the boosting decision tree model
 * Run './runDetect.m' using your model
