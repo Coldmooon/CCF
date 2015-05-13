@@ -13,7 +13,7 @@ function runDetect(id)
 
 addpath(genpath('./toolbox-master'));
 
-% load detectors
+% load detector
 clfDir = ['path_to_CCF_codes' '/model/'];
 nDs = 1;
 ds = cell(1,nDs);
@@ -27,9 +27,7 @@ for i=1:nDs
     ds{i} = d.detector;
 end
 
-% initialize caffe
-addpath(['path_to_caffe_codes' '/matlab/caffe']);
-%caffe('reset');
+% initialize caffe parameters
 model_def = './data/CaffeNets/VGG_ILSVRC_16_layers_conv3.prototxt';
 model_file = './data/CaffeNets/VGG_ILSVRC_16_layers.caffemodel';
 cnn = struct('model_def',model_def,...
@@ -41,14 +39,17 @@ opts = struct('input_size',900,'stride',4,'pad',16,...
         'lambda',0.2666,'imresize',1,'imflip',0,...
         'addCf',useCF,'savePyrd',0);
 
+% set image set
 imgDir = ['path_to_Caltech_dataset' '/test/'];
 imgNms = bbGt('getFiles',{[imgDir 'images']});
 if id>0
     imgNms = imgNms((id-1)*503+1:id*503);
 end
 
+% run detection
 allBBs = cnnDetect(imgNms, ds, opts, cnn);
 
+% save results
 save([clfDir '/allBBs_' num2str(id) '.mat'],...
      'allBBs');
 

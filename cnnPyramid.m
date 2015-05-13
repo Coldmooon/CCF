@@ -110,7 +110,8 @@ for i=1:nR
     feats = cell(length(data),1);
     for k=1:length(data)
         if(~caffe('is_initialized'))
-            caffe('init', cnn.model_def, cnn.model_file, 'test');
+            caffe('init', cnn.model_def, cnn.model_file);
+            caffe('set_phase_test');
             caffe('set_device',cnn.device);
             caffe('set_mode_gpu');
         end
