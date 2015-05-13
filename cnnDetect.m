@@ -58,16 +58,13 @@ else
 end
 
 if(opts.addCf)
+    cfOpts = ds{1}.cfopts;
     sz = size(I);
     for i=1:P.nScales
         I1 = imresize(I,P.scaleshw(i,:).*sz(1:2));
         I1 = I1./max(255,max(I1(:)));
-        C=chnsCompute(I1,opts.cfopts.pPyramid.pChns);
-        C=convTri(cat(3,C.data{:}),opts.cfopts.pPyramid.smooth);
-        fs=opts.cfopts.filters;
-        if(~isempty(fs)), C=repmat(C,[1 1 size(fs,4)]);
-            for j=1:size(C,3), C(:,:,j)=conv2(C(:,:,j),fs(:,:,j),'same'); end; end
-        if(~isempty(fs)), C=imResample(C,.5); end
+        C=chnsCompute(I1,cfOpts.pPyramid.pChns);
+        C=convTri(cat(3,C.data{:}),cfOpts.pPyramid.smooth);
         P.data{i} = cat(3,P.data{i},C);
     end
 end

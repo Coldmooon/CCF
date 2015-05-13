@@ -5,7 +5,7 @@ function runDetect(id)
 % For pedestrian detection, set nApprox in opts to 0,
 % as power law doesn't hold in Caltech dataset.
 %
-% set addCf in opts to 1 if you want to use CCF+CF model.
+% set useCF to 1 if you want to use CCF+CF model.
 % 
 % set savePyrd in opts to 1 if you want to cache pyramids
 % data, which needs MUCH disk space.
@@ -14,11 +14,17 @@ function runDetect(id)
 addpath(genpath('./toolbox-master'));
 
 % load detectors
-clfDir = ['path_to_CCF_codes' '/model/'];
+clfDir = '/home/derek/codes/DeepPyramid/classifiers';
+clfDir = [clfDir '/caltech/vgg_conv3/'];
 nDs = 1;
 ds = cell(1,nDs);
+dNms = {'Detector_caltech_depth5.mat',...
+        'Detector_caltech_wCF_266.mat'};
+% use the CCF detector (set to 1 to use the CCF+CF detector)
+useCF = 0;
+
 for i=1:nDs
-	d = load([clfDir 'Detector_caltech_depth5.mat']);
+    d = load([clfDir dNms{useCF+1}]);
     ds{i} = d.detector;
 end
 
@@ -34,7 +40,7 @@ cnn = struct('model_def',model_def,...
 opts = struct('input_size',900,'stride',4,'pad',16,...
         'minDs',72,'nPerOct',6,'nOctUp',1,'nApprox',0,...
         'lambda',0.2666,'imresize',1,'imflip',0,...
-        'addCf',0,'savePyrd',0);
+        'addCf',useCF,'savePyrd',0);
 
 imgDir = ['path_to_Caltech_dataset' '/test/'];
 imgNms = bbGt('getFiles',{[imgDir 'images']});
