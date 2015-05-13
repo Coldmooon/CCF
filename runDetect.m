@@ -14,8 +14,7 @@ function runDetect(id)
 addpath(genpath('./toolbox-master'));
 
 % load detectors
-clfDir = '/home/derek/codes/DeepPyramid/classifiers';
-clfDir = [clfDir '/caltech/vgg_conv3/'];
+clfDir = ['path_to_CCF_codes' '/model/'];
 nDs = 1;
 ds = cell(1,nDs);
 dNms = {'Detector_caltech_depth5.mat',...
