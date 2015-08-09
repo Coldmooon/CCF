@@ -42,6 +42,7 @@ The codes are written in Matlab codes, dependent on Caffe toolkit and Piotr's Co
 
 Much gratitude is presented to
 
-* Piotr Dollar and his toolbox
+* Piotr Dollar's toolbox
 * Caffe team
 * VGG team
+* NVIDIA Corporation
