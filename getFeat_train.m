@@ -1,10 +1,10 @@
 function getFeat_train()
-% Running on machine with >32G RAM is recommended, 
+% Running on machine with >32G RAM is recommended,
 % or you can change the batch size.
 %
 
 addpath(['path_to_caffe_codes' '/matlab/caffe']);
-model_def = './data/CaffeNets/VGG_ILSVRC_16_layers_conv3.prototxt';
+model_def = './data/CaffeNets/VGG_ILSVRC_16_layers_conv3_144.prototxt';
 model_file = './data/CaffeNets/VGG_ILSVRC_16_layers.caffemodel';
 caffe('reset');
 caffe('init', model_def, model_file, 'test');
@@ -22,12 +22,12 @@ A = dir([data_path '*.mat']);
 for l = 1:length(A)
   load([data_path A(l).name]);
   numImg = size(Is,4);
-  
+
   % pad rectangle to square for caffe input
   Is0 = Is(:,32:-1:1,:,:);
   Is1 = Is(:,end:-1:end-31,:,:);
   Is = cat(2,Is0,Is,Is1);
-  
+
   % augment bbs as the mini-batch = 100
   flag_aug = 0;
   if mod(numImg,100)~=0
@@ -35,10 +35,10 @@ for l = 1:length(A)
       newNum = ceil(numImg/100)*100;
       Is = cat(4,Is,Is(:,:,:,1:(newNum - numImg)));
   end
-  
+
   % pre-processing data
   Is = {prepare_image(Is, mean_pix)};
-  
+
   % do caffe forward pass to get feats
   fors = size(Is{1},4)/100;
   feats = cell(fors,1);
