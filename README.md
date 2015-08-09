@@ -1,6 +1,6 @@
 # README #
 
-The codes are for the paper "Convolutional Channel Features For Pedestrian, Face and Edge Detection".
+The codes are for the paper "Convolutional Channel Features: Tailoring CNN to Diverse Tasks", arXiv:1504.07339.
 
 Currently the codes include training and testing part for Caltech pedestrian detection. Models to produce curves in the paper are also provided.
 
@@ -36,7 +36,7 @@ The codes are written in Matlab codes, dependent on Caffe toolkit and Piotr's Co
 
 ### Reference ###
 
-* If you use our codes or models in your research, we are grateful if you cite the paper "Convolutional Channel Features For Pedestrian, Face and Edge Detection". 
+* If you use our codes or models in your research, we are grateful if you cite the paper "Convolutional Channel Features: Tailoring CNN to Diverse Tasks", arXiv:1504.07339. 
 
 ### Acknowledgement ###
 
