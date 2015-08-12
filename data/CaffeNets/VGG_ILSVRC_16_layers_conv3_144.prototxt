@@ -50,18 +50,7 @@ layers {
   }
 }
 layers {
-  name: "norm1"
-  type: LRN
   bottom: "pool1"
-  top: "norm1"
-  lrn_param {
-    local_size: 3
-    alpha: 0.0001
-    beta: 0.75
-  }
-}
-layers {
-  bottom: "norm1"
   top: "conv2_1"
   name: "conv2_1"
   type: CONVOLUTION
@@ -106,18 +95,7 @@ layers {
   }
 }
 layers {
-  name: "norm2"
-  type: LRN
   bottom: "pool2"
-  top: "norm2"
-  lrn_param {
-    local_size: 3
-    alpha: 0.0001
-    beta: 0.75
-  }
-}
-layers {
-  bottom: "norm2"
   top: "conv3_1"
   name: "conv3_1"
   type: CONVOLUTION
@@ -166,15 +144,4 @@ layers {
   top: "conv3_3"
   name: "relu3_3"
   type: RELU
-}
-layers {
-  name: "norm3"
-  type: LRN
-  bottom: "conv3_3"
-  top: "norm3"
-  lrn_param {
-    local_size: 3
-    alpha: 0.0001
-    beta: 0.75
-  }
 }
