@@ -12,13 +12,24 @@ opts = struct('input_size',900,'stride',4,'pad',16,...
         'addCf',0,'savePyrd',0);
 
 % load some random bbs for power law checking (Is: height x width x nChannels x bbNum)
-load('path_to_example_bbs');
+% load('path_to_example_bbs');
 %load('~/codes/faceDetection/sampledWins/view4_Is1Stage0.mat');
+Is_t = load('~/INRIA-test.mat'); Is_t = Is_t.ans;
+nImage = size(Is_t,2);
+image_size = size(Is_t{1,1});
+Is = zeros(image_size(1), image_size(2), image_size(3), nImage);
+for i=1:nImage
+    Is(:,:,:,i) = Is_t{1,i};
+end
 
 num = size(Is,4);
-P = cnnPyramid(Is(:,:,:,1),opts,cnn);
+try
+    load('P_face.mat','P');
+catch
+    P = cnnPyramid(Is(:,:,:,1),opts,cnn);
+    save('P_face.mat','P');
+end
 nScales = P.nScales;
-save('P_face.mat','P');
 
 fs=zeros(num,nScales,1);
 for i=1:num

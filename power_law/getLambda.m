@@ -1,6 +1,6 @@
 load('face/channel_mean.mat');
 
-fs = fs(randperm(300,100),:);
+fs = fs(randperm(201,100),:);
 
 load P_face;
 ls = chnsScaling( P.scales', fs, 1 );
