@@ -22,3 +22,4 @@ videos/private/ktComputeW_c.mexa64
 videos/private/ktHistcRgb_c.mexa64
 videos/private/opticalFlowHsMex.mexa64
 *.caffemodel
+*.mat
