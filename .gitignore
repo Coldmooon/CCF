@@ -1,8 +1,6 @@
 /videos/private/*png*.*
 /videos/private/*jpg8c.*
 /detector/models/*Dets.txt
-evaluation3.2.1/results/
-data/
 channels/private/convConst.mexa64
 channels/private/gradientMex.mexa64
 channels/private/imPadMex.mexa64
