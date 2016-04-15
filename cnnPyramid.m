@@ -31,11 +31,25 @@ lambda = opts.lambda;
 
 %% get scales, scalesR, scalesA
 [scales, scaleshw] = getScales(I,nPerOct,nOctUp,minDs,stride,1200);
-nScales=length(scales); if(1), isR=1; else isR=1+nOctUp*nPerOct; end
-isR=isR:nApprox+1:nScales; isA=1:nScales; isA(isR)=[];
-j=[0 floor((isR(1:end-1)+isR(2:end))/2) nScales];
-isN=1:nScales; for i=1:length(isR), isN(j(i)+1:j(i+1))=isR(i); end
-nTypes=0; data=cell(nScales,nTypes); info=struct([]);
+% ------------- original ------------
+nScales=length(scales); 
+if(1), 
+    isR=1; 
+else
+    isR=1+nOctUp*nPerOct; 
+end
+isR = isR:(nApprox + 1):nScales; 
+isA=1:nScales; 
+isA(isR)=[]; % isR means " is it real? ". -- by liyang.
+j=[0 floor((isR(1:end-1)+isR(2:end))/2) nScales]; % isA means " is it approximated? " -- by liyang.
+isN=1:nScales; 
+for i=1:length(isR), 
+    isN(j(i)+1:j(i+1))=isR(i); 
+end % isN means the nearest real scale.
+nTypes=0; 
+data=cell(nScales,nTypes); 
+info=struct([]);
+% --------------------------------------
 imsz=[size(I,1) size(I,2)];
 
 %% compute scalesR imPyrd
