@@ -53,6 +53,8 @@ if(nargin<3 || isempty(show)), show=1; end
 
 nScales=length(scales); nTypes=1; 
 
+% ------------------------ original ----------------------------
+
 % remove fs with fs(:,1,:) having small values
 kp=max(fs(:,1,:)); kp=fs(:,1,:)>kp(ones(1,size(fs,1)),1,:)/50;
 kp=min(kp,[],3); fs=fs(kp,:,:); nImages=size(fs,1);
@@ -95,3 +97,4 @@ for k=1:nTypes
 end
 
 end
+% ------------------------ original ----------------------------

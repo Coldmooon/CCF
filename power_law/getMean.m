@@ -31,13 +31,16 @@ catch
 end
 nScales = P.nScales;
 
-fs=zeros(num,nScales,1);
-for i=1:num
-    fprintf('%d/%d\n',i,num);
-    P = cnnPyramid(Is(:,:,:,i),opts,cnn);
-    for j=1:P.nScales
-      fs(i,j,1)=mean(P.data{j}(:));
+try
+    load('face/channel_mean.mat','fs');
+catch
+    fs=zeros(num,nScales,1);
+    for i=1:num
+        fprintf('%d/%d\n',i,num);
+        P = cnnPyramid(Is(:,:,:,i),opts,cnn);
+        for j=1:P.nScales
+          fs(i,j,1)=mean(P.data{j}(:));
+        end
     end
+    save('face/channel_mean.mat','fs');
 end
-
-save('face/channel_mean.mat','fs');
