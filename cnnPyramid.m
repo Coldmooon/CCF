@@ -63,6 +63,7 @@ for i=1:nR
 end
 
 %% convert imPyrd to cnnFeatPyrd at isR scales
+% compute cnn features for real scales. -- by liyang.
 net = {};
 caffe.reset_all();
 for i=1:nR
@@ -72,8 +73,8 @@ for i=1:nR
     im = imPyrd{i};
     [h,w,~] = size(im);
     if h>=w, flag_lgr=0; else flag_lgr=1; end;
-    lgr = max(h,w);
-    shr = min(h,w);
+    lgr = max(h,w); % lgr: longer -- by liyang
+    shr = min(h,w); % shr: shorter -- by liyang
 
     % seg or lay layers of imPyrd to make most use of CNN input_size
     flag_seg = 0;
@@ -96,9 +97,10 @@ for i=1:nR
         bbs = [pad+1,pad+w,pad+1,pad+h];
         flag_cmptd(j) = 1;
         sz = ceil((lgr+2*pad)/stride)*stride;
-        n0 = floor((input_size+2*pad)/sz);
+        % Patchwork, see paper. n0 is used to 
+        n0 = floor((input_size+2*pad)/sz); 
         n=n0;
-        if n0>1
+        if n0>1  % Patchwork, see paper. -- liyang
             flag_lay = 1;
             n = min(sum(flag_cmptd(isR)==0)+1,n0*n0);
             flag_cmptd(isR(i:i+n-1)) = 1;
