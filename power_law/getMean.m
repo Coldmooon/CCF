@@ -44,6 +44,10 @@ for i=1:nImage
 end
 
 num = size(Is,4);
+caffe.reset_all();
+caffe.set_mode_gpu();
+net = caffe.Net(cnn.model_def, cnn.model_file, 'test');
+cnn.net = net;
 try
     load('P_face.mat','P');
 catch

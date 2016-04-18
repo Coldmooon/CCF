@@ -14,6 +14,7 @@ function Pyr = cnnPyramid(I,opts,cnn)
 addpath('/home/coldmoon/Developer/caffe/matlab');
 %caffe('reset');
 meanPixel = cnn.meanPix;
+net = cnn.net;
 input_size = opts.input_size;
 stride = opts.stride;
 pad = opts.pad;
@@ -64,8 +65,6 @@ end
 
 %% convert imPyrd to cnnFeatPyrd at isR scales
 % compute cnn features for real scales. -- by liyang.
-net = {};
-caffe.reset_all();
 for i=1:nR
     j = isR(i);
     if flag_cmptd(j), continue; end;
@@ -129,14 +128,14 @@ for i=1:nR
     feats = cell(length(data),1);
     for k=1:length(data)
 %         if(~caffe_('is_initialized'))
-        if(isempty(net))
-%             caffe('init', cnn.model_def, cnn.model_file);
-%             caffe('set_phase_test');
-%             caffe('set_device',cnn.device);
-%             caffe('set_mode_cpu');
-            caffe.set_mode_cpu();
-            net = caffe.Net(cnn.model_def, cnn.model_file, 'test');
-        end
+%         if(isempty(net))
+% %             caffe('init', cnn.model_def, cnn.model_file);
+% %             caffe('set_phase_test');
+% %             caffe('set_device',cnn.device);
+% %             caffe('set_mode_cpu');
+%             caffe.set_mode_gpu();
+%             net = caffe.Net(cnn.model_def, cnn.model_file, 'test');
+%         end
 %         feat = caffe('forward',data(k));
         feat = net.forward(data(k));
         feat = feat{1};
