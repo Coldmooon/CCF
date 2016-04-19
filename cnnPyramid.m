@@ -76,8 +76,8 @@ for i=1:nR
     shr = min(h,w); % shr: shorter -- by liyang
 
     % seg or lay layers of imPyrd to make most use of CNN input_size
-    flag_seg = 0;
-    flag_lay = 0;
+    flag_seg = 0; % cut images into several pieces if image > input size -- by liyang
+    flag_lay = 0; % lay images on the canvas(input) if image < input size -- by liyang
     if lgr>input_size 
         flag_seg = 1; flag_cmptd(j) = 1;
         n0 = ceil(h/input_size);
@@ -95,12 +95,16 @@ for i=1:nR
     else
         bbs = [pad+1,pad+w,pad+1,pad+h];
         flag_cmptd(j) = 1;
+        % A square made by the longer side of the image. -- by liyang
         sz = ceil((lgr+2*pad)/stride)*stride;
-        % Patchwork, see paper. n0 is used to 
+        % Patchwork, see paper. n0 is used to decided how many images can
+        % be put on the canvas. -- by liyang.
         n0 = floor((input_size+2*pad)/sz); 
         n=n0;
         if n0>1  % Patchwork, see paper. -- liyang
             flag_lay = 1;
+            % put n0*n0 images onto the canvas. But if the images left are
+            % less than n0*n0, then put the images left. -- by liyang.
             n = min(sum(flag_cmptd(isR)==0)+1,n0*n0);
             flag_cmptd(isR(i:i+n-1)) = 1;
             bbs = zeros(n,4);
@@ -108,7 +112,18 @@ for i=1:nR
                 p = floor((k-1)/n0)+1;
                 q = k-(p-1)*n0;
                 [h1,w1,~] = size(imPyrd{i+k-1});
-                x1 = (q-1)*sz+pad+1;
+                % bbs: making a box where the images will be put into. Note
+                % that each box is the longer side size plus the pad size.
+                % This leads to that each subsequent image from image
+                % pyramid will be put at the position of n*stride. Use
+                % imshow(uint8(batches{1})) to see this. Doing so is for
+                % extracting CNN features for convenience.
+                % x1: the left horizontal position
+                % x2: the right horizontal position
+                % y1: the up vertical position
+                % y2: the bottom vertical position
+                % -- by liyang
+                x1 = (q-1)*sz+pad+1; 
                 x2 = (q-1)*sz+pad+w1;
                 y1 = (p-1)*sz+pad+1;
                 y2 = (p-1)*sz+pad+h1;
@@ -170,6 +185,19 @@ for i=1:nR
             osz = sz/stride;
             feat = feats{1};
             for k=1:n
+                % Note: stride is a very important parameter. It's used to
+                % help extract CNN features at the right place. For VGGnet,
+                % stage1, stage2, stage3 perserve the input size, while
+                % pooling layer downsample the input to the half size. So,
+                % for the stage where we want to extract CNN features, we
+                % need to set stride accordingly. For stage 1, the feature
+                % map size is perserved, 932*932. So the layout of feature
+                % map is the same as the input image. We only need to set
+                % the stride to 1. For stage 2, the feature map size is
+                % 466*466. The layout of feature map size is half of the
+                % image. So we need to set the stride to 2. For stage 3,
+                % stride should be 4. And stride: 8 for stage 4.
+                % -- by liyang.
                 [h1,w1,~] = size(imPyrd{i+k-1});
                 p = floor((k-1)/n0)+1;
                 q = k-(p-1)*n0;
