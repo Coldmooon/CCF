@@ -15,7 +15,7 @@ opts = struct('input_size',900,'stride',4,'pad',16,...
 % load('path_to_example_bbs');
 %load('~/codes/faceDetection/sampledWins/view4_Is1Stage0.mat');
 % Is_t = load('~/INRIA-test.mat'); Is_t = Is_t.ans;
-Is_t = load('AFW_test.mat'); Is_t = Is_t.Is;
+Is_t = load('Imagenet_val_1_200.mat'); Is_t = Is_t.Is_t;
 
 nImage = size(Is_t,2);
 delete = zeros(1,nImage);
@@ -27,6 +27,7 @@ end
 Is_t(find(delete)) = [];
 nImage = size(Is_t,2);
 
+% Crop images to the same size.
 ds=[inf inf]; 
 for i=1:nImage, 
     ds=min(ds,[size(Is_t{i},1) size(Is_t{i},2)]); 
@@ -36,6 +37,14 @@ ds=floor(ds/opts.stride)*opts.stride; % for INRIA train pos. --by liyang
 for i=1:nImage, 
     Is_t{i}=Is_t{i}(1:ds(1),1:ds(2),:); 
 end
+% ----------------------------
+
+% resize images
+% for i=1:nImage, 
+%     Is_t{i} = resample(Is_t{i}, 256, 256); 
+% end
+% --------------
+
 image_size = size(Is_t{1,1});
 Is = zeros(image_size(1), image_size(2), image_size(3), nImage);
 for i=1:nImage
