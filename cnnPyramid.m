@@ -11,9 +11,14 @@ function Pyr = cnnPyramid(I,opts,cnn)
 %
 
 % addpath(['path_to_caffe_codes' '/matlab/caffe']);
-addpath('/home/coldmoon/Developer/caffe/matlab');
+% addpath('/home/coldmoon/Developer/caffe/matlab');
 %caffe('reset');
 meanPixel = cnn.meanPix;
+meanfile = cnn.meanfile;
+if(~isempty(meanfile))
+    meanImage = load(meanfile); meanImage = meanImage.meanImage;
+    meanPixel = mean(mean(meanImage));
+end
 net = cnn.net;
 input_size = opts.input_size;
 stride = opts.stride;
@@ -58,9 +63,15 @@ flag_cmptd = zeros(nScales,1);
 featPyrd = cell(nScales,1);
 nR = length(isR);
 imPyrd = cell(nR,1);
+I = prepareBatch({I},meanPixel, meanImage); I = I{1};
 for i=1:nR
-    s=scales(isR(i)); sz1=round(imsz*s/stride)*stride;
-    if(all(imsz==sz1)), imPyrd{i}=I; else imPyrd{i}=imResampleMex(I,sz1(1),sz1(2),1); end
+    s=scales(isR(i)); 
+    sz1=round(imsz*s/stride)*stride;
+    if(all(imsz==sz1)), 
+        imPyrd{i}=I; 
+    else
+        imPyrd{i}=imResampleMex(I,sz1(1),sz1(2),1); 
+    end
 end
 
 %% convert imPyrd to cnnFeatPyrd at isR scales
@@ -139,7 +150,8 @@ for i=1:nR
     end
 
     % do CNN forward
-    data = prepareBatch(batches,meanPixel);
+%     data = prepareBatch(batches,meanPixel, meanImage);
+    data = batches;
     feats = cell(length(data),1);
     for k=1:length(data)
 %         if(~caffe_('is_initialized'))
