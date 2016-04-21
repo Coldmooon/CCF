@@ -18,6 +18,8 @@ meanfile = cnn.meanfile;
 if(~isempty(meanfile))
     meanImage = load(meanfile); meanImage = meanImage.meanImage;
     meanPixel = mean(mean(meanImage));
+else
+    meanImage = [];
 end
 net = cnn.net;
 input_size = opts.input_size;
@@ -63,14 +65,15 @@ flag_cmptd = zeros(nScales,1);
 featPyrd = cell(nScales,1);
 nR = length(isR);
 imPyrd = cell(nR,1);
-I = prepareBatch({I},meanPixel, meanImage); I = I{1};
+% I = prepareBatch({I},meanPixel, meanImage); I = I{1};
 for i=1:nR
     s=scales(isR(i)); 
     sz1=round(imsz*s/stride)*stride;
     if(all(imsz==sz1)), 
         imPyrd{i}=I; 
     else
-        imPyrd{i}=imResampleMex(I,sz1(1),sz1(2),1); 
+%         imPyrd{i}=imResampleMex(I,sz1(1),sz1(2),1); 
+        imPyrd{i}=imResample(I,s , 'nearest',1); 
     end
 end
 
@@ -150,8 +153,8 @@ for i=1:nR
     end
 
     % do CNN forward
-%     data = prepareBatch(batches,meanPixel, meanImage);
-    data = batches;
+    data = prepareBatch(batches,meanPixel, meanImage);
+%     data = batches;
     feats = cell(length(data),1);
     for k=1:length(data)
 %         if(~caffe_('is_initialized'))
