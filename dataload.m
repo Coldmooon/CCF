@@ -48,7 +48,8 @@ else
     nImage = size(Is, 1);
     h_and_w = sqrt(size(Is, 2)/3);
     Is = permute(reshape(Is, [nImage,h_and_w,h_and_w,3]), [2 3 4 1]); 
-    selected = randperm(10000, 200);
+%     selected = randperm(10000, 200);
+    selected = [1:200];
     Is = Is(:,:,:,selected);
 end
 
