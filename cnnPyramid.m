@@ -153,7 +153,7 @@ for i=1:nR
     end
 
     % do CNN forward
-    data = prepareBatch(batches,meanPixel, meanImage);
+    data = prepareBatch(batches,meanPixel);
 %     data = batches;
     feats = cell(length(data),1);
     for k=1:length(data)
