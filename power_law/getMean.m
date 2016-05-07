@@ -1,8 +1,10 @@
+for k=1:10
+fprintf('Computing %d0000 model\n', k);
 addpath(genpath('../../CCF'));
 addpath('/home/coldmoon/ComputerVision/caffe/matlab');
-model_def = '../data/CaffeNets/VGG_ILSVRC_16_layers_conv3.prototxt';
-model_file = '../data/CaffeNets/VGG_ILSVRC_16_layers.caffemodel';
-meanfile = ''
+model_def = '../data/CaffeNets/nin_elu_deploy.prototxt';
+model_file = ['../data/CaffeNets/elu_gauss_iter_',num2str(k),'0000.caffemodel'];
+meanfile = 'cifar10_mean_vertical.mat';
 cnn = struct('model_def',model_def,...
              'model_file',model_file,...
              'device',0,...
@@ -18,18 +20,21 @@ opts = struct('input_size',900,'stride',4,'pad',16,...
 % load('path_to_example_bbs');
 %load('~/codes/faceDetection/sampledWins/view4_Is1Stage0.mat');
 
-Is = dataload('ImageNetval_1_200.mat',opts.stride);
+% Is = load('cifar10_train_vertical.mat'); Is = Is.cifar10_train;
+Is = dataload('cifar10_train_vertical.mat',opts.stride);
 
 num = size(Is,4);
 caffe.reset_all();
 caffe.set_mode_gpu();
 net = caffe.Net(cnn.model_def, cnn.model_file, 'test');
 cnn.net = net;
+
 try
     load('P_face.mat','P');
 catch
     P = cnnPyramid(Is(:,:,:,1),opts,cnn);
-    save('P_face.mat','P');
+    disp(['saving P_face_cifar10train_nin_cccp6_elu_iter', num2str(k) ,'0k.mat']);
+    save(['P_face_cifar10train_nin_cccp6_elu_iter', num2str(k) ,'0k.mat'],'P');
 end
 nScales = P.nScales;
 
@@ -37,12 +42,22 @@ try
     load('face/channel_mean.mat','fs');
 catch
     fs=zeros(num,nScales,1);
-    for i=1:num
-        fprintf('%d/%d\n',i,num);
-        P = cnnPyramid(Is(:,:,:,i),opts,cnn);
-        for j=1:P.nScales
-          fs(i,j,1)=mean(P.data{j}(:));
+    % 4 for batch_size. -- by liyang.
+    for i=1:4:num
+        fprintf('%d/%d ',i,num);
+        if(mod(i-1, 40) == 0)
+            fprintf('\n');
+        end
+        P = cnnPyramid(Is(:,:,:,i:i+3),opts,cnn);
+        for l=1:4 % 4 for batch_size
+            for j=1:P.nScales
+              fs(i+l-1,j)=mean(P.data{j,l}(:));
+            end
         end
     end
-    save('face/channel_mean.mat','fs');
+    disp(['face/channel_mean_cifar10train_nin_cccp6_elu_iter', num2str(k),'0k.mat']);
+    save(['face/channel_mean_cifar10train_nin_cccp6_elu_iter', num2str(k),'0k.mat'],'fs');
+end
+
+
 end

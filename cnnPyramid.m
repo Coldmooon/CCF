@@ -16,11 +16,16 @@ function Pyr = cnnPyramid(I,opts,cnn)
 meanPixel = cnn.meanPix;
 meanfile = cnn.meanfile;
 if(~isempty(meanfile))
-    meanImage = load(meanfile); meanImage = meanImage.meanImage;
+    meanImage = load(meanfile); 
+    meanfilename = fieldnames(meanImage);
+    meanImage = getfield(meanImage, meanfilename{1});
     meanPixel = mean(mean(meanImage));
+    meanPixel = permute(meanPixel, [3,2,1]);
+    meanPixel = flipud(meanPixel);
 else
     meanImage = [];
 end
+nImages = size(I,4);
 net = cnn.net;
 input_size = opts.input_size;
 stride = opts.stride;
@@ -62,28 +67,29 @@ imsz=[size(I,1) size(I,2)];
 
 %% compute scalesR imPyrd
 flag_cmptd = zeros(nScales,1);
-featPyrd = cell(nScales,1);
+featPyrd = cell(nScales,nImages);
 nR = length(isR);
-imPyrd = cell(nR,1);
+imPyrd = cell(nR,nImages);
 % I = prepareBatch({I},meanPixel, meanImage); I = I{1};
-for i=1:nR
-    s=scales(isR(i)); 
-    sz1=round(imsz*s/stride)*stride;
-    if(all(imsz==sz1)), 
-        imPyrd{i}=I; 
-    else
-%         imPyrd{i}=imResampleMex(I,sz1(1),sz1(2),1); 
-        imPyrd{i}=imResample(I,s , 'nearest',1); 
+for j=1:nImages
+    for i=1:nR
+        s=scales(isR(i)); 
+        sz1=round(imsz*s/stride)*stride;
+        if(all(imsz==sz1)), 
+            imPyrd{i,j}=I(:,:,:,j); 
+        else
+    %         imPyrd{i,j}=imResampleMex(I(:,:,:,j),sz1(1),sz1(2),1); 
+            imPyrd{i,j}=imResample(I(:,:,:,j),s , 'nearest',1); 
+        end
     end
 end
-
 %% convert imPyrd to cnnFeatPyrd at isR scales
 % compute cnn features for real scales. -- by liyang.
 for i=1:nR
     j = isR(i);
     if flag_cmptd(j), continue; end;
 
-    im = imPyrd{i};
+    im = imPyrd{i}; %im_cell = imPyrd(i, :);
     [h,w,~] = size(im);
     if h>=w, flag_lgr=0; else flag_lgr=1; end;
     lgr = max(h,w); % lgr: longer -- by liyang
@@ -145,32 +151,40 @@ for i=1:nR
             end
         end
         inputIm = single(zeros(input_size+2*pad,input_size+2*pad,3));
+        % Note: the channels of meanPixel are BGR, so imputIm need to be
+        % assigned in the reverse order. -- by liyang.
         inputIm(:,:,1) = meanPixel(3);
         inputIm(:,:,2) = meanPixel(2);
         inputIm(:,:,3) = meanPixel(1);
-        batches = cell(1,1);
-        batches{1} = bbCrop2(inputIm,bbs,imPyrd(i:i+n-1));
+%         batches = cell(1,1);
+        batches = bbCrop2(inputIm,bbs,imPyrd(i:i+n-1, :));
+        
     end
 
     % do CNN forward
     data = prepareBatch(batches,meanPixel);
 %     data = batches;
-    feats = cell(length(data),1);
-    for k=1:length(data)
+    feats = cell(nImages,1);
+    net.blobs('data').reshape([932 932 3 nImages]); 
+    feat = net.forward({data}); feat = feat{1};
+    feat = permute(feat,[2 1 3 4]);
+    for k = 1:nImages
+        feats{k} = feat(:,:,:,k);
+    end
+%     for k=1:nImages
 %         if(~caffe_('is_initialized'))
 %         if(isempty(net))
-% %             caffe('init', cnn.model_def, cnn.model_file);
-% %             caffe('set_phase_test');
-% %             caffe('set_device',cnn.device);
-% %             caffe('set_mode_cpu');
+%             caffe('init', cnn.model_def, cnn.model_file);
+%             caffe('set_phase_test');
+%             caffe('set_device',cnn.device);
+%             caffe('set_mode_cpu');
 %             caffe.set_mode_gpu();
 %             net = caffe.Net(cnn.model_def, cnn.model_file, 'test');
 %         end
 %         feat = caffe('forward',data(k));
-        feat = net.forward(data(k));
-        feat = feat{1};
-        feats{k} = permute(feat,[2 1 3]);
-    end
+%         feat_tmp = feat{1};
+%         feats{k} = permute(feat_tmp,[2 1 3]);
+%     end
 
     % featPyrd recontruction
     opad = pad/stride;
@@ -198,30 +212,32 @@ for i=1:nR
     else
         if flag_lay
             osz = sz/stride;
-            feat = feats{1};
-            for k=1:n
-                % Note: stride is a very important parameter. It's used to
-                % help extract CNN features at the right place. For VGGnet,
-                % stage1, stage2, stage3 perserve the input size, while
-                % pooling layer downsample the input to the half size. So,
-                % for the stage where we want to extract CNN features, we
-                % need to set stride accordingly. For stage 1, the feature
-                % map size is perserved, 932*932. So the layout of feature
-                % map is the same as the input image. We only need to set
-                % the stride to 1. For stage 2, the feature map size is
-                % 466*466. The layout of feature map size is half of the
-                % image. So we need to set the stride to 2. For stage 3,
-                % stride should be 4. And stride: 8 for stage 4.
-                % -- by liyang.
-                [h1,w1,~] = size(imPyrd{i+k-1});
-                p = floor((k-1)/n0)+1;
-                q = k-(p-1)*n0;
-                oh = ceil(h1/stride); ow = ceil(w1/stride);
-                xx1 = (q-1)*osz+opad+1;
-                xx2 = (q-1)*osz+opad+ow;
-                yy1 = (p-1)*osz+opad+1;
-                yy2 = (p-1)*osz+opad+oh;
-                featPyrd{isR(i+k-1)} = feat(yy1:yy2,xx1:xx2,:);
+            for l=1:nImages
+                feat = feats{l};
+                for k=1:n
+                    % Note: stride is a very important parameter. It's used to
+                    % help extract CNN features at the right place. For VGGnet,
+                    % stage1, stage2, stage3 perserve the input size, while
+                    % pooling layer downsample the input to the half size. So,
+                    % for the stage where we want to extract CNN features, we
+                    % need to set stride accordingly. For stage 1, the feature
+                    % map size is perserved, 932*932. So the layout of feature
+                    % map is the same as the input image. We only need to set
+                    % the stride to 1. For stage 2, the feature map size is
+                    % 466*466. The layout of feature map size is half of the
+                    % image. So we need to set the stride to 2. For stage 3,
+                    % stride should be 4. And stride: 8 for stage 4.
+                    % -- by liyang.
+                    [h1,w1,~] = size(imPyrd{i+k-1});
+                    p = floor((k-1)/n0)+1;
+                    q = k-(p-1)*n0;
+                    oh = ceil(h1/stride); ow = ceil(w1/stride);
+                    xx1 = (q-1)*osz+opad+1;
+                    xx2 = (q-1)*osz+opad+ow;
+                    yy1 = (p-1)*osz+opad+1;
+                    yy2 = (p-1)*osz+opad+oh;
+                    featPyrd{isR(i+k-1),l} = feat(yy1:yy2,xx1:xx2,:);
+                end
             end
         else
             featPyrd{j} = feats{1}(opad+1:opad+oh,opad+1:opad+ow,:);
