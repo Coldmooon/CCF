@@ -160,38 +160,38 @@ layer {
   bottom: "conv3"
   top: "m2pelu_conv3"
 }
-#layer {
-#  name: "cccp5"
-#  type: "Convolution"
-#  bottom: "m2pelu_conv3"
-#  top: "cccp5"
-#  convolution_param {
-#    num_output: 192
-#    kernel_size: 1
-#  }
-#}
-#layer {
-#  name: "m2pelu_cccp5"
-#  type: "M2PELU"
-#  bottom: "cccp5"
-#  top: "m2pelu_cccp5"
-#}
-#layer {
-#  name: "cccp6"
-#  type: "Convolution"
-#  bottom: "m2pelu_cccp5"
-#  top: "cccp6"
-#  convolution_param {
-#    num_output: 10
-#    kernel_size: 1
-#  }
-#}
-#layer {
-#  name: "m2pelu_cccp6"
-#  type: "M2PELU"
-#  bottom: "cccp6"
-#  top: "m2pelu_cccp6"
-#}
+layer {
+  name: "cccp5"
+  type: "Convolution"
+  bottom: "m2pelu_conv3"
+  top: "cccp5"
+  convolution_param {
+    num_output: 192
+    kernel_size: 1
+  }
+}
+layer {
+  name: "m2pelu_cccp5"
+  type: "M2PELU"
+  bottom: "cccp5"
+  top: "m2pelu_cccp5"
+}
+layer {
+  name: "cccp6"
+  type: "Convolution"
+  bottom: "m2pelu_cccp5"
+  top: "cccp6"
+  convolution_param {
+    num_output: 10
+    kernel_size: 1
+  }
+}
+layer {
+  name: "m2pelu_cccp6"
+  type: "M2PELU"
+  bottom: "cccp6"
+  top: "m2pelu_cccp6"
+}
 #layer {
 #  name: "pool3"
 #  type: "Pooling"
