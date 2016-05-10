@@ -70,6 +70,7 @@ flag_cmptd = zeros(nScales,1);
 featPyrd = cell(nScales,nImages);
 nR = length(isR);
 imPyrd = cell(nR,nImages);
+% It is wrong to subtract meanPixel before resample. -- by liyang.
 % I = prepareBatch({I},meanPixel, meanImage); I = I{1};
 for j=1:nImages
     for i=1:nR
