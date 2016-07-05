@@ -14,16 +14,18 @@ function Pyr = cnnPyramid(I,opts,cnn)
 % addpath('/home/coldmoon/Developer/caffe/matlab');
 %caffe('reset');
 meanPixel = cnn.meanPix;
-meanfile = cnn.meanfile;
-if(~isempty(meanfile))
-    meanImage = load(meanfile); 
-    meanfilename = fieldnames(meanImage);
-    meanImage = getfield(meanImage, meanfilename{1});
-    meanPixel = mean(mean(meanImage));
-    meanPixel = permute(meanPixel, [3,2,1]);
-    meanPixel = flipud(meanPixel);
-else
-    meanImage = [];
+if(isempty(meanPixel))
+    meanfile = cnn.meanfile;
+    if(~isempty(meanfile))
+        meanImage = load(meanfile); 
+        meanfilename = fieldnames(meanImage);
+        meanImage = getfield(meanImage, meanfilename{1});
+        meanPixel = mean(mean(meanImage));
+        meanPixel = permute(meanPixel, [3,2,1]);
+        meanPixel = flipud(meanPixel);
+    else
+        meanImage = [];
+    end
 end
 nImages = size(I,4);
 net = cnn.net;
@@ -43,7 +45,9 @@ end
 lambda = opts.lambda;
 
 %% get scales, scalesR, scalesA
-[scales, scaleshw] = getScales(I,nPerOct,nOctUp,minDs,stride,1200);
+% [scales, scaleshw] = getScales(I,nPerOct,nOctUp,minDs,stride,1200);
+scales = [1.375, 1.25, 1.125, 1.0, 0.875, 0.75, 0.625];
+
 % ------------- original ------------
 nScales=length(scales); 
 if(1), 
@@ -166,7 +170,7 @@ for i=1:nR
     data = prepareBatch(batches,meanPixel);
 %     data = batches;
     feats = cell(nImages,1);
-    net.blobs('data').reshape([932 932 3 nImages]); 
+    net.blobs('data').reshape([392 392 3 nImages]); 
     feat = net.forward({data}); feat = feat{1};
     feat = permute(feat,[2 1 3 4]);
     for k = 1:nImages
@@ -254,7 +258,7 @@ for i=isA
 end
 
 %% return struct cnnPyrd
-Pyr = struct('data',{featPyrd},'nScales',nScales,'scales',scales,'scaleshw',scaleshw);
+Pyr = struct('data',{featPyrd},'nScales',nScales,'scales',scales);%,'scaleshw',scaleshw);
 
 end
 
