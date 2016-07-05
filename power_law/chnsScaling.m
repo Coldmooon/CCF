@@ -56,15 +56,28 @@ nScales=length(scales); nTypes=1;
 % ------------------------ original ----------------------------
 
 % remove fs with fs(:,1,:) having small values
-kp=max(fs(:,1,:)); kp=fs(:,1,:)>kp(ones(1,size(fs,1)),1,:)/50;
-kp=min(kp,[],3); fs=fs(kp,:,:); nImages=size(fs,1);
+kp=max(fs(:,1,:)); 
+kp=fs(:,1,:)>kp(ones(1,size(fs,1)),1,:)/50;
+kp=min(kp,[],3); 
+fs=fs(kp,:,:); 
+nImages=size(fs,1);
 
 % compute ratios, intercepts and lambdas using least squares
-scales1=scales(2:end); nScales=nScales-1; O=ones(nScales,1);
-rs=fs(:,2:end,:)./fs(:,O,:); mus=permute(mean(rs,1),[2 3 1]);
-out=[O -log2(scales1)]\log2(mus); as=2.^out(1,:); lambdas=out(2,:);
-if(0), lambdas=-log2(scales1)\log2(mus); as(:)=1; end
-if(show==0), return; end
+scales1=scales(2:end); 
+nScales=nScales-1; 
+O=ones(nScales,1);
+rs=fs(:,2:end,:)./fs(:,O,:); 
+mus=permute(mean(rs,1),[2 3 1]);
+out=[O -log2(scales1)]\log2(mus); 
+as=2.^out(1,:); 
+lambdas=out(2,:);
+if(0), 
+    lambdas=-log2(scales1)\log2(mus); 
+    as(:)=1; 
+end
+if(show==0), 
+    return; 
+end
 
 % compute predicted means and errors for display purposes
 musp=as(O,:).*scales1(:,ones(1,nTypes)).^-lambdas(O,:);
