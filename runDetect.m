@@ -14,7 +14,7 @@ function runDetect(id)
 addpath(genpath('./toolbox-master'));
 
 % load detector
-clfDir = ['path_to_CCF_codes' '/model/'];
+clfDir = ['.' '/model/'];
 nDs = 1;
 ds = cell(1,nDs);
 dNms = {'Detector_caltech_depth5.mat',...
@@ -30,17 +30,19 @@ end
 % initialize caffe parameters
 model_def = './data/CaffeNets/VGG_ILSVRC_16_layers_conv3.prototxt';
 model_file = './data/CaffeNets/VGG_ILSVRC_16_layers.caffemodel';
-cnn = struct('model_def',model_def,...
+cnn = struct('net',model_def,...
              'model_file',model_file,...
              'device',0,...
              'meanPix',[103.939 116.779 123.68]);
 opts = struct('input_size',900,'stride',4,'pad',16,...
-        'minDs',72,'nPerOct',6,'nOctUp',1,'nApprox',0,...
+        'minDs',72,'nPerOct',6,'nOctUp',1,'nApprox',5,...
         'lambda',0.2666,'imresize',1,'imflip',0,...
         'addCf',useCF,'savePyrd',0);
 
 % set image set
-imgDir = ['path_to_Caltech_dataset' '/test/'];
+% imgDir = ['path_to_Caltech_dataset' '/test/'];
+
+imgDir = ['/home/coldmoon/ComputerVision/ColdPdollarToolbox/data/Caltech' '/test/'];
 imgNms = bbGt('getFiles',{[imgDir 'images']});
 if id>0
     imgNms = imgNms((id-1)*503+1:id*503);
